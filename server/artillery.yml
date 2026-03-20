@@ -1,0 +1,33 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 15
+      rampTo: 20
+      name: "Warm up phase"
+    - duration: 60
+      arrivalRate: 20
+      name: "Sustained peak load (1000+ total users)"
+
+scenarios:
+  - name: "Browse products flow"
+    flow:
+      - get:
+          url: "/api/products"
+      - think: 1
+      - get:
+          url: "/api/products/1"
+
+  - name: "Register and Login flow (10% of users)"
+    weight: 1
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            username: "tester_{{ $randomString() }}"
+            password: "password123"
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "tester_{{ $randomString() }}"
+            password: "password123"
